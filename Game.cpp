@@ -74,13 +74,18 @@ void Game::Render() const
 {
 	Console::Lock(true);
 	Console::Clear();
-	
+
 	paddle.Draw();
 	ball.Draw();
 
 	// TODO #3 - Update render to render all bricks
 	for (const Box& brick : bricks)
-	brick.Draw();
+		brick.Draw();
+
+	if (bricks.empty())
+		Console::WordWrap(23, 20, 40, "You win! Press 'R' to play again.");
+	else if (ball.y_position >= WINDOW_HEIGHT - 1)
+		Console::WordWrap(23, 20, 40, "You lose. Press 'R' to play again.");
 
 	Console::Lock(false);
 }
@@ -89,7 +94,7 @@ void Game::CheckCollision()
 {
 	// TODO #4 - Update collision to check all bricks
 	for (int i = 0; i < (int)bricks.size(); i++)
-	{ 
+	{
 		if (bricks[i].Contains(ball.x_position + ball.x_velocity, ball.y_position + ball.y_velocity))
 		{
 			bricks[i].color = ConsoleColor(bricks[i].color - 1);
@@ -113,4 +118,6 @@ void Game::CheckCollision()
 	}
 
 	// TODO #7 - If ball touches bottom of window, pause ball and display (render) defeat text with R to reset
+	if (ball.y_position >= WINDOW_HEIGHT - 1)
+		ball.moving = false;
 }
