@@ -14,6 +14,8 @@ class Game
 public:
 	Game();
 	bool Update();
+	bool won;
+	bool lost;
 	void Render() const;
 	void Reset();
 	void ResetBall();
