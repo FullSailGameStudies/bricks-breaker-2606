@@ -20,12 +20,20 @@ void Game::Reset()
 	ResetBall();
 
 	// TODO #2 - Add this brick and 4 more bricks to the vector
-	brick.width = 10;
-	brick.height = 2;
-	brick.x_position = 0;
-	brick.y_position = 5;
-	brick.doubleThick = true;
-	brick.color = ConsoleColor::DarkGreen;
+	bricks.clear(); // Clear vector before adding new ones
+
+	// Iterate 5 times to create 5 bricks
+	for (int i = 0; i < 5; ++i)
+	{
+		Box newBrick;
+		newBrick.width = 10;
+		newBrick.height = 2;
+		newBrick.x_position = i * 12; // Position bricks with some spacing (TODO #3?)
+		newBrick.y_position = 5;
+		newBrick.doubleThick = true;
+		newBrick.color = ConsoleColor::DarkGreen;
+		bricks.push_back(newBrick);
+	}
 }
 
 void Game::ResetBall()
@@ -69,7 +77,28 @@ void Game::Render() const
 	ball.Draw();
 
 	// TODO #3 - Update render to render all bricks
-	brick.Draw();
+	for (const auto& brick : bricks)
+	{
+		brick.Draw();
+	}
+
+	// Display Victory Text
+	if (bricks.empty())
+	{
+		Console::SetCursorPosition(20, 15);
+		Console::ForegroundColor(Yellow);
+		Console::WordWrap(20, 15, 40, "VICTORY!!! Press R to Reset!");
+		Console::ResetColor();
+	}
+
+	// Display Defeat Text
+	if (ball.y_position >= WINDOW_HEIGHT)
+	{
+		Console::SetCursorPosition(20, 15);
+		Console::ForegroundColor(Red);
+		Console::WordWrap(20, 15, 40, "DEFEAT!!! Press R to Reset!");
+		Console::ResetColor();
+	}
 
 	Console::Lock(false);
 }
@@ -77,22 +106,49 @@ void Game::Render() const
 void Game::CheckCollision()
 {
 	// TODO #4 - Update collision to check all bricks
-	if (brick.Contains(ball.x_position + ball.x_velocity, ball.y_position + ball.y_velocity))
+	
+	// Iterate through bricks for collision check
+	for (int i = 0; i < bricks.size(); ++i)
 	{
-		brick.color = ConsoleColor(brick.color - 1);
-		ball.y_velocity *= -1;
+		if (bricks[i].Contains(ball.x_position + ball.x_velocity, ball.y_position + ball.y_velocity))
+		{
+			bricks[i].color = ConsoleColor(bricks[i].color - 1);
+			ball.y_velocity *= -1;
 
 		// TODO #5 - If the ball hits the same brick 3 times (color == black), remove it from the vector
+			
+			// Black Color Check for brick removal
+			if (bricks[i].color == ConsoleColor::Black)
+			{
+				bricks.erase(bricks.begin() + i);
+			}
 
+			break; // Exit collision loop
+		}
 	}
 
 	// TODO #6 - If no bricks remain, pause ball and display (render) victory text with R to reset
 
-
-	if (paddle.Contains(ball.x_position + ball.x_velocity, ball.y_velocity + ball.y_position))
+	// Check for victory condition (no bricks left)
+	if (bricks.empty())
 	{
-		ball.y_velocity *= -1;
+		// Pause the ball
+		ball.moving = false;
 	}
 
+	// Paddle collision check
+	if (paddle.Contains(ball.x_position + ball.x_velocity, ball.y_velocity + ball.y_position))
+	{
+		ball.y_velocity *= -1;	
+	}
+	
+
 	// TODO #7 - If ball touches bottom of window, pause ball and display (render) defeat text with R to reset
+
+	// Check for defeat condition (ball touches bottom)
+	if (ball.y_position + ball.y_velocity >= WINDOW_HEIGHT)
+	{
+		// Pause the ball
+		ball.moving = false;
+	}
 }
