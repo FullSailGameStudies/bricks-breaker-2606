@@ -75,7 +75,21 @@ void Game::Render() const
 	ball.Draw();
 
 	// TODO #3 - Update render to render all bricks
-	brick.Draw();
+	for (const auto& brick : bricks)
+	{
+		brick.Draw();
+	}
+
+	if (bricks.empty())
+	{
+		Console::SetCursorPosition(WINDOW_WIDTH / 2 - 16, WINDOW_HEIGHT / 2);
+		std::cout << "You win! Press 'R' to play again.";
+	}
+	else if (ball.y_position >= WINDOW_HEIGHT - 1)
+	{
+		Console::SetCursorPosition(WINDOW_WIDTH / 2 - 17, WINDOW_HEIGHT / 2);
+		std::cout << "You lose. Press 'R' to play again.";
+	}
 
 	Console::Lock(false);
 }
