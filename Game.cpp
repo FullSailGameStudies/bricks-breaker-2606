@@ -65,12 +65,12 @@ bool Game::Update()
 	return true;
 }
 
-//  All rendering, including text, should occur in the Render function
+// All rendering, including text, should occur in the Render function
 void Game::Render() const
 {
 	Console::Lock(true);
 	Console::Clear();
-	
+
 	paddle.Draw();
 	ball.Draw();
 
@@ -104,7 +104,7 @@ void Game::CheckCollision()
 			it->color = ConsoleColor(it->color - 1);
 			ball.y_velocity *= -1;
 
-		// TODO #5 - If the ball hits the same brick 3 times (color == black), remove it from the vector
+			// TODO #5 - If the ball hits the same brick 3 times (color == black), remove it from the vector
 			if (it->color == ConsoleColor::Black)
 			{
 				it = bricks.erase(it);
@@ -121,8 +121,6 @@ void Game::CheckCollision()
 	}
 
 	// TODO #6 - If no bricks remain, pause ball and display (render) victory text with R to reset
-
-
 	if (bricks.empty())
 	{
 		ball.moving = false;
