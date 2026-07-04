@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "Game.h"
+#include <vector>
 
 Game::Game()
 {
@@ -10,6 +11,8 @@ void Game::Reset()
 {
 	Console::SetWindowSize(WINDOW_WIDTH, WINDOW_HEIGHT);
 	Console::CursorVisible(false);
+	defeat = false; // Reset defeat 
+
 	paddle.width = 12;
 	paddle.height = 2;
 	paddle.x_position = 32;
@@ -19,13 +22,57 @@ void Game::Reset()
 	ball.color = ConsoleColor::Cyan;
 	ResetBall();
 
+	bricks.clear(); // Clears the vector from previous game attempt.
+
+
+
 	// TODO #2 - Add this brick and 4 more bricks to the vector
+	Box brick;
 	brick.width = 10;
 	brick.height = 2;
 	brick.x_position = 0;
 	brick.y_position = 5;
 	brick.doubleThick = true;
 	brick.color = ConsoleColor::DarkGreen;
+	bricks.push_back(brick);
+
+	Box brick2;
+	brick2.width = 10;
+	brick2.height = 2;
+	brick2.x_position = 12;
+	brick2.y_position = 5;
+	brick2.doubleThick = true;
+	brick2.color = ConsoleColor::DarkGreen;
+	bricks.push_back(brick2);
+
+	Box brick3;
+	brick3.width = 10;
+	brick3.height = 2;
+	brick3.x_position = 24;
+	brick3.y_position = 5;
+	brick3.doubleThick = true;
+	brick3.color = ConsoleColor::DarkGreen;
+	bricks.push_back(brick3);
+
+	Box brick4;
+	brick4.width = 10;
+	brick4.height = 2;
+	brick4.x_position = 36;
+	brick4.y_position = 5;
+	brick4.doubleThick = true;
+	brick4.color = ConsoleColor::DarkGreen;
+	bricks.push_back(brick4);
+
+	Box brick5;
+	brick5.width = 10;
+	brick5.height = 2;
+	brick5.x_position = 48;
+	brick5.y_position = 5;
+	brick5.doubleThick = true;
+	brick5.color = ConsoleColor::DarkGreen;
+	bricks.push_back(brick5);
+
+
 }
 
 void Game::ResetBall()
@@ -69,7 +116,20 @@ void Game::Render() const
 	ball.Draw();
 
 	// TODO #3 - Update render to render all bricks
-	brick.Draw();
+	for (const auto& brick : bricks)
+	{
+		brick.Draw();
+	}
+	bool victory = bricks.empty();
+
+	if (victory)
+	{
+		Console::SetCursorPosition(WINDOW_WIDTH / 2 - 10, WINDOW_HEIGHT / 2);
+		Console::ForegroundColor(ConsoleColor::Yellow);
+		std::cout << "Victory! you cleared the board! Press 'R' To Try Again";
+	}
+
+	
 
 	Console::Lock(false);
 }
@@ -77,22 +137,53 @@ void Game::Render() const
 void Game::CheckCollision()
 {
 	// TODO #4 - Update collision to check all bricks
-	if (brick.Contains(ball.x_position + ball.x_velocity, ball.y_position + ball.y_velocity))
+	for (size_t i = 0; i < bricks.size(); ++i)
 	{
-		brick.color = ConsoleColor(brick.color - 1);
-		ball.y_velocity *= -1;
+		if (bricks[i].Contains(ball.x_position + ball.x_velocity, ball.y_position + ball.y_velocity))
+		{
+			bricks[i].color = ConsoleColor(bricks[i].color - 1);
+			ball.y_velocity *= -1;
 
-		// TODO #5 - If the ball hits the same brick 3 times (color == black), remove it from the vector
+			if (bricks[i].color == ConsoleColor::Black)
+			{
+				bricks.erase(bricks.begin() + i);
+				--i; // fixes the index when removing bricks from the vector
+			}
 
+
+			// TODO #5 - If the ball hits the same brick 3 times (color == black), remove it from the vector
+
+			break;
+		}
 	}
 
 	// TODO #6 - If no bricks remain, pause ball and display (render) victory text with R to reset
 
+	if (bricks.empty())
+	{
+
+		bool	victory = true;
+		ball.moving = false; //freezes the ball when the win con is met.
+		Console::SetCursorPosition(WINDOW_WIDTH / 2 - 10, WINDOW_HEIGHT / 2);
+		Console::ForegroundColor(ConsoleColor::Yellow);
+		std::cout << "Victory! you cleared the board! Press 'R' To Try Again";
+
+	}
 
 	if (paddle.Contains(ball.x_position + ball.x_velocity, ball.y_velocity + ball.y_position))
 	{
 		ball.y_velocity *= -1;
 	}
 
+
+
 	// TODO #7 - If ball touches bottom of window, pause ball and display (render) defeat text with R to reset
+	if (ball.y_position + ball.y_velocity >= WINDOW_HEIGHT)
+	{
+		defeat = true;
+		ball.moving = false;
+		Console::SetCursorPosition(WINDOW_WIDTH / 2 - 10, WINDOW_HEIGHT / 2);
+		Console::ForegroundColor(ConsoleColor::Red);
+		std::cout << "Defeat! you lost! Press 'R' To Try Again";
+	}
 }
