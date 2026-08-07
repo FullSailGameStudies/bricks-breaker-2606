@@ -180,7 +180,7 @@ void Console::DrawBox(int left, int top, int width, int height, bool dbl)
 	y = top + height - 1;
 	Show(left, y, Set[4]);
 	for (int col = 0; col < width - 2; col++)
-		Show(Set[1]);
+	Show(Set[1]);
 	Show(Set[5]);
 }
 
