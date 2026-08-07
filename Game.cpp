@@ -11,6 +11,7 @@ void Game::Reset()
 	lost = false;
 
 	Console::SetWindowSize(WINDOW_WIDTH, WINDOW_HEIGHT);
+	Console::SetBufferSize(WINDOW_WIDTH, WINDOW_HEIGHT);
 	Console::CursorVisible(false);
 	paddle.width = 12;
 	paddle.height = 2;
@@ -34,7 +35,7 @@ void Game::Reset()
 
 		brick.width = brickWidth;
 		brick.height = 2;
-		brick.x_position =  i * (brickWidth + spacing);
+		brick.x_position = i * (brickWidth + spacing);
 		brick.y_position = 5;
 		brick.doubleThick = true;
 		brick.color = ConsoleColor::DarkGreen;
@@ -99,17 +100,22 @@ void Game::Render() const
 		Console::SetCursorPosition(WINDOW_WIDTH / 2 - 16, WINDOW_HEIGHT / 2);
 		std::cout << "You win! Press 'R' to play again.";
 	}
-
 	Console::Lock(false);
+
+
+
+
+
 }
 
 void Game::CheckCollision()
 {
 	// TODO #4 - Update collision to check all bricks
-	for (size_t i = 0; i < bricks.size(); ++i)
+	for (int i = 0; i < bricks.size(); ++i)
 	{
 		if (bricks[i].Contains(ball.x_position + ball.x_velocity, ball.y_position + ball.y_velocity))
 		{
+			//bricks[i].color = ConsoleColor(bricks[i].color - 1);
 			++bricks[i].hitCount;
 			ball.y_velocity *= -1;
 
@@ -118,18 +124,27 @@ void Game::CheckCollision()
 			{
 				bricks.erase(bricks.begin() + i);
 			}
+			else if (bricks[i].hitCount == 2)
+			{
+				bricks[i].color = ConsoleColor::Yellow;
+			}
+			else if (bricks[i].hitCount == 1)
+			{
+				bricks[i].color = ConsoleColor::Red;
+			}
 
 			break;
 
+	
+		
 		}
 	}
 
 	// TODO #6 - If no bricks remain, pause ball and display (render) victory text with R to reset
-	if (bricks.empty())
+	if (bricks.size() == 0)
 	{
 		ball.moving = false;
 	}
-
 
 	if (paddle.Contains(ball.x_position + ball.x_velocity, ball.y_velocity + ball.y_position))
 	{
@@ -144,3 +159,4 @@ void Game::CheckCollision()
 		lost = true;
 	}
 }
+
