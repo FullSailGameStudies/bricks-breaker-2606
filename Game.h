@@ -9,8 +9,8 @@ class Game
 	Box paddle;
 
 	// TODO #1 - Instead of storing 1 brick, store a vector of bricks (by value)
-	std::vector<Box> bricks;
-	bool defeat = false; // Lose on ball falling below paddle
+	std::vector<Box> brick;
+	bool defeat = false; // Lose on ball missing the paddle
 	
 
 public:

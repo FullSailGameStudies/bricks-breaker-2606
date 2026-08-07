@@ -22,19 +22,20 @@ void Game::Reset()
 	ball.color = ConsoleColor::Cyan;
 	ResetBall();
 
-	bricks.clear(); // Clears the vector from previous game attempt.
+	brick.clear(); // Clears the vector from previous game attempt.
 
 
 
 	// TODO #2 - Add this brick and 4 more bricks to the vector
-	Box brick;
-	brick.width = 10;
-	brick.height = 2;
-	brick.x_position = 0;
-	brick.y_position = 5;
-	brick.doubleThick = true;
-	brick.color = ConsoleColor::DarkGreen;
-	bricks.push_back(brick);
+	Box brick1;
+	brick1.width = 10;
+	brick1.height = 2;
+	brick1.x_position = 0;
+	brick1.y_position = 5;
+	brick1.doubleThick = true;
+	brick1.color = ConsoleColor::DarkGreen;
+	brick.push_back(brick1);
+
 
 	Box brick2;
 	brick2.width = 10;
@@ -43,7 +44,8 @@ void Game::Reset()
 	brick2.y_position = 5;
 	brick2.doubleThick = true;
 	brick2.color = ConsoleColor::DarkGreen;
-	bricks.push_back(brick2);
+	brick.push_back(brick2);
+	
 
 	Box brick3;
 	brick3.width = 10;
@@ -52,7 +54,8 @@ void Game::Reset()
 	brick3.y_position = 5;
 	brick3.doubleThick = true;
 	brick3.color = ConsoleColor::DarkGreen;
-	bricks.push_back(brick3);
+	brick.push_back(brick3);
+	
 
 	Box brick4;
 	brick4.width = 10;
@@ -61,7 +64,7 @@ void Game::Reset()
 	brick4.y_position = 5;
 	brick4.doubleThick = true;
 	brick4.color = ConsoleColor::DarkGreen;
-	bricks.push_back(brick4);
+	brick.push_back(brick4);
 
 	Box brick5;
 	brick5.width = 10;
@@ -70,7 +73,8 @@ void Game::Reset()
 	brick5.y_position = 5;
 	brick5.doubleThick = true;
 	brick5.color = ConsoleColor::DarkGreen;
-	bricks.push_back(brick5);
+	brick.push_back(brick5);
+	
 
 
 }
@@ -116,11 +120,11 @@ void Game::Render() const
 	ball.Draw();
 
 	// TODO #3 - Update render to render all bricks
-	for (const auto& brick : bricks)
+	for (const auto& brick : brick)
 	{
 		brick.Draw();
 	}
-	bool victory = bricks.empty();
+	bool victory = brick.empty();
 
 	if (victory)
 	{
@@ -137,16 +141,16 @@ void Game::Render() const
 void Game::CheckCollision()
 {
 	// TODO #4 - Update collision to check all bricks
-	for (size_t i = 0; i < bricks.size(); ++i)
+	for (size_t i = 0; i < brick.size(); ++i)
 	{
-		if (bricks[i].Contains(ball.x_position + ball.x_velocity, ball.y_position + ball.y_velocity))
+		if (brick[i].Contains(ball.x_position + ball.x_velocity, ball.y_position + ball.y_velocity))
 		{
-			bricks[i].color = ConsoleColor(bricks[i].color - 1);
+			brick[i].color = ConsoleColor(brick[i].color - 1);
 			ball.y_velocity *= -1;
 
-			if (bricks[i].color == ConsoleColor::Black)
+			if (brick[i].color == ConsoleColor::Black)
 			{
-				bricks.erase(bricks.begin() + i);
+				brick.erase(brick.begin() + i);
 				--i; // fixes the index when removing bricks from the vector
 			}
 
@@ -159,7 +163,7 @@ void Game::CheckCollision()
 
 	// TODO #6 - If no bricks remain, pause ball and display (render) victory text with R to reset
 
-	if (bricks.empty())
+	if (brick.empty())
 	{
 
 		bool	victory = true;
@@ -184,6 +188,6 @@ void Game::CheckCollision()
 		ball.moving = false;
 		Console::SetCursorPosition(WINDOW_WIDTH / 2 - 10, WINDOW_HEIGHT / 2);
 		Console::ForegroundColor(ConsoleColor::Red);
-		std::cout << "Defeat! you lost! Press 'R' To Try Again";
+		std::cout << "Defeat you lost! Press 'R' To Try Again";
 	}
 }
