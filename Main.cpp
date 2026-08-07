@@ -17,7 +17,7 @@ int main()
 
 		if (game.Update() == false)
 			break;
-		game.Render();
+ 		game.Render();
 
 		if (GetAsyncKeyState(VK_UP) & 0x1)
 			frameTimer-=5;
