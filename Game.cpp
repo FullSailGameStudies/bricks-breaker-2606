@@ -23,7 +23,7 @@ void Game::Reset()
 	// TODO #2 - Add this brick and 4 more bricks to the vector
 	bricks.clear();
 
-	for (int i = 0; i < 5; i++)
+	for (int i = 0; i < 1; i++)
 	{
 		Box brick;
 
@@ -91,6 +91,15 @@ void Game::Render() const
 		brick.Draw();
 	}
 	Console::Lock(false);
+
+	if (bricks.size() == 0)
+	{
+		Console::Clear();
+		Console::SetCursorPosition(25, 15);
+
+		std::cout << "You win. Press R to restart." << std::endl;
+
+	}
 }
 
 void Game::CheckCollision()
@@ -122,6 +131,10 @@ void Game::CheckCollision()
 
 	// TODO #6 - If no bricks remain, pause ball and display (render) victory text with R to reset
 	
+	if (bricks.size() == 0)
+	{
+		ball.moving = false;
+	}
 
 	if (paddle.Contains(ball.x_position + ball.x_velocity, ball.y_velocity + ball.y_position))
 	{
