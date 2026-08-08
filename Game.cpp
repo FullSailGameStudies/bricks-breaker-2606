@@ -23,7 +23,7 @@ void Game::Reset()
 	// TODO #2 - Add this brick and 4 more bricks to the vector
 	bricks.clear();
 
-	for (int i = 0; i < 1; i++)
+	for (int i = 0; i < 5; i++)
 	{
 		Box brick;
 
@@ -100,6 +100,15 @@ void Game::Render() const
 		std::cout << "You win. Press R to restart." << std::endl;
 
 	}
+
+	if (ball.y_position >= WINDOW_HEIGHT - 1)
+	{
+		Console::Clear();
+		Console::SetCursorPosition(25, 15);
+
+		std::cout << "You suck. Press R to restart." << std::endl;
+
+	}
 }
 
 void Game::CheckCollision()
@@ -142,4 +151,13 @@ void Game::CheckCollision()
 	}
 
 	// TODO #7 - If ball touches bottom of window, pause ball and display (render) defeat text with R to reset
+
+	if (ball.y_position >= WINDOW_HEIGHT - 1)
+	{
+		ball.moving = false;
+
+		
+		
+	}
+
 }
