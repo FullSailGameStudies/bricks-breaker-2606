@@ -20,27 +20,36 @@ void Game::Reset()
 	ResetBall();
 
 	// TODO #2 - Add this brick and 4 more bricks to the vector
-	
+
 	bricks.clear();
 
 	int brickCount = 5;
+	int rowCount = 3;
+
 	int brickWidth = 10;
 	int brickSpacing = 0;
 	int startingX = 0;
+	int startingY = 5;
+	int rowSpacing = 3;
 
-	for (int i = 0; i < brickCount; i++)
+	for (int row = 0; row < rowCount; row++)
 	{
-		bricks.emplace_back();
+		for (int i = 0; i < brickCount; i++)
+		{
+			bricks.emplace_back();
 
-		Box& brick = bricks.back();
-		brick.width = brickWidth;
-		brick.height = 2;
-		brick.x_position = startingX + i * (brickWidth + brickSpacing);
-		brick.y_position = 5;
-		brick.doubleThick = true;
-		brick.color = ConsoleColor::DarkCyan;
+			Box& brick = bricks.back();
+
+			brick.width = brickWidth;
+			brick.height = 2;
+
+			brick.x_position = startingX + i * (brickWidth + brickSpacing);
+			brick.y_position = startingY + row * rowSpacing;
+			brick.doubleThick = true;
+			brick.color = ConsoleColor::DarkCyan;
+		}
+
 	}
-
 }
 
 void Game::ResetBall()
@@ -86,10 +95,11 @@ void Game::Render() const
 	ball.Draw();
 
 	// TODO #3 - Update render to render all bricks
-	for (const Box& brick : bricks)
+	for (int i = 0; i < bricks.size(); i++)
 	{
-		brick.Draw();
+		bricks[i].Draw();
 	}
+
 	if (gameWon)
 	{
 		const char message[] = "You Win! Press 'R' to play again!";
