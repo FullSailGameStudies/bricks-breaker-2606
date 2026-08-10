@@ -20,28 +20,37 @@ void Game::Reset()
 	ResetBall();
 
 	// TODO #2 - Add this brick and 4 more bricks to the vector
-	
+
 	bricks.clear();
 
 	int brickCount = 5;
+	int rowCount = 3;
 	int brickWidth = 10;
 	int brickSpacing = 0;
 	int startingX = 0;
+	int startingY = 5;
+	int rowSpacing = 3;
 
-	for (int i = 0; i < brickCount; i++)
+	for (int row = 0; row < rowCount; row++)
 	{
-		bricks.emplace_back();
+		for (int i = 0; i < brickCount; i++)
+		{
+			bricks.emplace_back();
 
-		Box& brick = bricks.back();
-		brick.width = brickWidth;
-		brick.height = 2;
-		brick.x_position = startingX + i * (brickWidth + brickSpacing);
-		brick.y_position = 5;
-		brick.doubleThick = true;
-		brick.color = ConsoleColor::DarkCyan;
+			Box& brick = bricks.back();
+
+			brick.width = brickWidth;
+			brick.height = 2;
+
+			brick.x_position = startingX + i * (brickWidth + brickSpacing);
+			brick.y_position = startingY + row * rowSpacing;
+			brick.doubleThick = true;
+			brick.color = ConsoleColor::DarkCyan;
+		}
+
 	}
-
 }
+
 
 void Game::ResetBall()
 {
@@ -52,6 +61,26 @@ void Game::ResetBall()
 	ball.x_velocity = rand() % 2 ? 1 : -1;
 	ball.y_velocity = -1;
 	ball.moving = false;
+}
+
+void Game::AddNewRow(int rowY)
+{
+	int brickCount = 5;
+	int brickWidth = 10;
+	int brickSpacing = 1;
+	int startingX = 0;
+
+	for (int i = 0; i < brickCount; i++)
+	{
+		bricks.emplace_back();
+		Box& brick = bricks.back();
+		brick.width = brickWidth;
+		brick.height = 2;
+		brick.x_position = startingX + i * (brickWidth + brickSpacing);
+		brick.y_position = rowY;
+		brick.doubleThick = true;
+		brick.color = ConsoleColor::DarkCyan;
+	}
 }
 
 bool Game::Update()
@@ -65,6 +94,13 @@ bool Game::Update()
 	if (GetAsyncKeyState(VK_LEFT) && paddle.x_position > 0)
 		paddle.x_position -= 2;
 
+	//Sticks the ball to the paddle until Space is pressed to launch it
+	if (!ball.moving && !gameLost)
+	{
+		ball.x_position = paddle.x_position + paddle.width / 2;
+		ball.y_position = paddle.y_position - 1;
+	}
+
 	if (GetAsyncKeyState(VK_SPACE) & 0x1)
 		ball.moving = !ball.moving;
 
@@ -73,6 +109,25 @@ bool Game::Update()
 
 	ball.Update();
 	CheckCollision();
+	int rowPositions[] = { 5, 8, 11 };
+	for (int row = 0; row < 3; row++)
+	{
+		int rowY = rowPositions[row];
+		bool rowHasBricks = false;
+		for (const Box& brick : bricks)
+		{
+			if (brick.y_position == rowY)
+			{
+				rowHasBricks = true;
+				break;
+			}
+		}
+		if (!rowHasBricks && rowsGenerated < maxRowsGenerated)
+		{
+			AddNewRow(rowY);
+			rowsGenerated++;
+		}
+	}
 	return true;
 }
 
@@ -86,10 +141,11 @@ void Game::Render() const
 	ball.Draw();
 
 	// TODO #3 - Update render to render all bricks
-	for (const Box& brick : bricks)
+	for (int i = 0; i < bricks.size(); i++)
 	{
-		brick.Draw();
+		bricks[i].Draw();
 	}
+
 	if (gameWon)
 	{
 		const char message[] = "You Win! Press 'R' to play again!";
@@ -134,7 +190,7 @@ void Game::CheckCollision()
 	}
 
 	// TODO #6 - If no bricks remain, pause ball and display (render) victory text with R to reset
-	if (bricks.empty())
+	if (bricks.empty() && rowsGenerated >= maxRowsGenerated)
 	{
 		gameWon = true;
 		ball.moving = false;
@@ -148,9 +204,10 @@ void Game::CheckCollision()
 
 	// TODO #7 - If ball touches bottom of window, pause ball and display (render) defeat text with R to reset
 
-	if (ball.y_position >= WINDOW_HEIGHT - 1)
+	if (ball.y_position >= WINDOW_HEIGHT - 1 && ball.moving == true)
 	{
-		gameLost = true;
+	
 		ball.moving = false;
+		gameLost = true;
 	}
 }
