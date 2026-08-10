@@ -4,7 +4,7 @@
 #include <iostream>
 #include "Console.h"
 
-#define WINDOW_WIDTH 80
+#define WINDOW_WIDTH 54
 #define WINDOW_HEIGHT 40
 #define FRAMES_PER_SECOND 15
 
