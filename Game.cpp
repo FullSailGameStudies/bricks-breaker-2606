@@ -23,15 +23,19 @@ void Game::Reset()
 	lost = false;
 	
 	// TODO #2 - Add this brick and 4 more bricks to the vector
+	int gap = 4;
+	int brickWidth = 10;
+	int rowWidth = 5 * brickWidth + 4 * gap;
+	int beginX = (WINDOW_WIDTH - rowWidth) / 2;
 	for (int i = 0; i < 5; i++)
 	{
 		Box brick;
 		brick.width = 10;
 		brick.height = 2;
-		brick.x_position = i * brick.width;;
+		brick.x_position = beginX + i * (brickWidth + gap);
 		brick.y_position = 5;
 		brick.doubleThick = true;
-		brick.color = ConsoleColor::DarkGreen;
+		brick.color = ConsoleColor::DarkCyan;
 		bricks.push_back(brick);
 	}
 }
