@@ -27,6 +27,8 @@ void Game::Reset()
 	int brickWidth = 10;
 	int rowWidth = 5 * brickWidth + 4 * gap;
 	int beginX = (WINDOW_WIDTH - rowWidth) / 2;
+	bricks.clear();
+
 	for (int i = 0; i < 5; i++)
 	{
 		Box brick;
@@ -66,8 +68,11 @@ bool Game::Update()
 	if (GetAsyncKeyState('R') & 0x1)
 		Reset();
 
-	ball.Update();
-	CheckCollision();
+	// if (!won && !lost)
+	//{
+		ball.Update();
+		CheckCollision();
+// }
 	return true;
 }
 
@@ -135,5 +140,6 @@ void Game::CheckCollision()
 	{
 		ball.moving = false;
 		lost = true;
+		bricks.clear();
 	}
 }
