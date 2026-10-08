@@ -5,6 +5,7 @@ class Box : public BaseObject
 {
 public:
 	bool doubleThick = false;
+	int health = 3;
 	int width = 2;
 	int height = 2;
 	void Draw() const override;
