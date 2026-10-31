@@ -32,7 +32,7 @@ void Game::Reset()
 		brick.x_position = i * 12; //i completly forgot that the x postion was the horizontal plain and was going to leave this alone ;-;
 		brick.y_position = 5;
 		brick.doubleThick = true;
-		brick.color = ConsoleColor::DarkGreen; // huh, i dont think this is the right color becasue after two hits it dissapears! should i change that?
+		brick.color = ConsoleColor::DarkCyan; // ok changed the color aspect of it to actually dissapear in 3 hits
 		
 		Game::brick.push_back(brick); //me had a head ache when i did not incluse the Game:: at the start
 
@@ -65,8 +65,12 @@ bool Game::Update()
 	if (GetAsyncKeyState('R') & 0x1)
 		Reset();
 
-	if (GetAsyncKeyState('C') & 0x1) //i implemented this so that i dont have to wait for the ball to destroy all the bricks to show the vctory message ;-;
+	if (GetAsyncKeyState('C') & 0x1) //i implemented this so that i dont have to wait for the ball to destroy all the bricks to show the victory message ;-;
 		Game::brick.clear();
+
+	if (GetAsyncKeyState('V') & 0x1) //i implemented a dev console command to test out the failure condition
+		ball.y_position = WINDOW_HEIGHT - 1;
+
 
 	ball.Update();
 	CheckCollision();
@@ -90,8 +94,15 @@ void Game::Render() const
 
 	if (Game::brick.empty())
 	{
-		Console::ForegroundColor(ConsoleColor::White);
-		Console::WordWrap(20, 15, 40, "Congrats! You won! now please press R to restart.");
+		Console::ForegroundColor(ConsoleColor::White); //forgot to add notes on this on the previous commit ;-;
+		Console::WordWrap(20, 15, 40, "You win! Press R to play again.");
+		Console::ResetColor();
+	} 
+	
+	else if (ball.y_position >= WINDOW_HEIGHT - 1)
+	{
+		Console::ForegroundColor(ConsoleColor::Red); //the falure condition message! :D
+		Console::WordWrap(20, 15, 40, "You lose. Press R to play again.");
 		Console::ResetColor();
 	}
 
@@ -121,7 +132,7 @@ void Game::CheckCollision()
 	}
 	if (removeindex != -1)
 	{
-		Game::brick.erase(Game::brick.begin() + removeindex); //bye bye brick! just deletes the brick that turns black without moving the others! :D
+		Game::brick.erase(Game::brick.begin() + removeindex); //bye bye brick! just deletes the brick that turns black without moving the others visually! :D
 	}
 	// TODO #6 - If no bricks remain, pause ball and display (render) victory text with R to reset
 	if (Game::brick.empty())
@@ -135,4 +146,8 @@ void Game::CheckCollision()
 	}
 
 	// TODO #7 - If ball touches bottom of window, pause ball and display (render) defeat text with R to reset
+	if (ball.y_position >= WINDOW_HEIGHT - 1)
+	{
+		ball.moving = false; //this is the fail condion to make it stop, but if its forced (pressing v) while its moving upwards, it keeps going
+	}
 }
