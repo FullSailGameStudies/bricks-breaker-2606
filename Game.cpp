@@ -82,11 +82,27 @@ void Game::Render() const
 	ball.Draw();
 
 	// TODO #3 - Update render to render all bricks
-	for (const Box& b : bricks)
+	for (size_t i = 0; i < bricks.size(); i++)
 	{
-		b.Draw();
+		bricks[i].Draw();
+	}
+	// TODO #6 - If no bricks remain, pause ball and display (render) victory text with R to reset
+
+
+	if (bricks.empty())
+	{
+		Console::ForegroundColor(ConsoleColor::Yellow);
+		Console::SetCursorPosition(WINDOW_WIDTH / 2 - 10, WINDOW_HEIGHT / 2);
+		std::cout << "VICTORY! Press R to Reset";
 	}
 
+	// TODO #7 - If ball touches bottom of window, pause ball and display (render) defeat text with R to reset
+	else if (ball.y_position >= WINDOW_HEIGHT - 1)
+	{
+		Console::ForegroundColor(ConsoleColor::Red);
+		Console::SetCursorPosition(WINDOW_WIDTH / 2 - 11, WINDOW_HEIGHT / 2);
+		std::cout << "GAME OVER! Press R to Reset";
+	}
 	Console::Lock(false);
 }
 
@@ -116,18 +132,17 @@ void Game::CheckCollision()
 
 	if (bricks.empty())
 	{	
-		Console::ForegroundColor(ConsoleColor::Yellow);
-		Console::SetCursorPosition(WINDOW_WIDTH / 2 - 10, WINDOW_HEIGHT / 2);
-		std::cout << "VICTORY! Press R to Reset";
+		ball.moving = false;
+	}
+	if (paddle.Contains(ball.x_position + ball.x_velocity, ball.y_velocity + ball.y_position))
+	{
+		ball.y_velocity *= -1;
 	}
 
 	// TODO #7 - If ball touches bottom of window, pause ball and display (render) defeat text with R to reset
-	else if (ball.y_position >= WINDOW_HEIGHT - 1)
+	if (ball.y_position >= WINDOW_HEIGHT -1)
 	{
-		Console::ForegroundColor(ConsoleColor::Red);
-		Console::SetCursorPosition(WINDOW_WIDTH / 2 - 11, WINDOW_HEIGHT / 2);
-		std::cout << "GAME OVER! Press R to Reset";
+		ball.moving = false;
 	}
-	Console::Lock(false);
 
 }
