@@ -65,6 +65,9 @@ bool Game::Update()
 	if (GetAsyncKeyState('R') & 0x1)
 		Reset();
 
+	if (GetAsyncKeyState('C') & 0x1) //i implemented this so that i dont have to wait for the ball to destroy all the bricks to show the vctory message ;-;
+		Game::brick.clear();
+
 	ball.Update();
 	CheckCollision();
 	return true;
@@ -83,6 +86,13 @@ void Game::Render() const
 	for (const Box& brick : Game::brick) // well this was easy ... too easy *squinting eyes*
 	{
 		brick.Draw();
+	}
+
+	if (Game::brick.empty())
+	{
+		Console::ForegroundColor(ConsoleColor::White);
+		Console::WordWrap(20, 15, 40, "Congrats! You won! now please press R to restart.");
+		Console::ResetColor();
 	}
 
 	Console::Lock(false);
@@ -114,7 +124,10 @@ void Game::CheckCollision()
 		Game::brick.erase(Game::brick.begin() + removeindex); //bye bye brick! just deletes the brick that turns black without moving the others! :D
 	}
 	// TODO #6 - If no bricks remain, pause ball and display (render) victory text with R to reset
-	
+	if (Game::brick.empty())
+	{
+		ball.moving = false; //tested and it works well now gotta make the message
+	}
 
 	if (paddle.Contains(ball.x_position + ball.x_velocity, ball.y_velocity + ball.y_position))
 	{
