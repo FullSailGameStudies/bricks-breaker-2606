@@ -20,12 +20,23 @@ void Game::Reset()
 	ResetBall();
 
 	// TODO #2 - Add this brick and 4 more bricks to the vector
-	brick.width = 10;
-	brick.height = 2;
-	brick.x_position = 0;
-	brick.y_position = 5;
-	brick.doubleThick = true;
-	brick.color = ConsoleColor::DarkGreen;
+
+	brick.clear(); //gotta clear the boxes right? im a test with out if it would give a intresting challenge >:3
+
+	for (int i = 0; i < 5;i++) // simple for loop, hopefully it works when i get the other errors fixed
+	{
+		Box brick;
+
+		brick.width = 10;
+		brick.height = 2;
+		brick.x_position = i * 12; //i completly forgot that the x postion was the horizontal plain and was going to leave this alone ;-;
+		brick.y_position = 5;
+		brick.doubleThick = true;
+		brick.color = ConsoleColor::DarkCyan; // ok changed the color aspect of it to actually dissapear in 3 hits
+		
+		Game::brick.push_back(brick); //me had a head ache when i did not incluse the Game:: at the start
+
+	} //yippe! cleared the errors here! :D on to the next one!!!
 }
 
 void Game::ResetBall()
@@ -54,6 +65,13 @@ bool Game::Update()
 	if (GetAsyncKeyState('R') & 0x1)
 		Reset();
 
+	if (GetAsyncKeyState('C') & 0x1) //i implemented this so that i dont have to wait for the ball to destroy all the bricks to show the victory message ;-;
+		Game::brick.clear();
+
+	if (GetAsyncKeyState('V') & 0x1) //i implemented a dev console command to test out the failure condition
+		ball.y_position = WINDOW_HEIGHT - 1;
+
+
 	ball.Update();
 	CheckCollision();
 	return true;
@@ -69,25 +87,58 @@ void Game::Render() const
 	ball.Draw();
 
 	// TODO #3 - Update render to render all bricks
-	brick.Draw();
+	for (const Box& brick : Game::brick) // well this was easy ... too easy *squinting eyes*
+	{
+		brick.Draw();
+	}
+
+	if (Game::brick.empty())
+	{
+		Console::ForegroundColor(ConsoleColor::White); //forgot to add notes on this on the previous commit ;-;
+		Console::WordWrap(20, 15, 40, "You win! Press R to play again.");
+		Console::ResetColor();
+	} 
+	
+	else if (ball.y_position >= WINDOW_HEIGHT - 1)
+	{
+		Console::ForegroundColor(ConsoleColor::Red); //the falure condition message! :D
+		Console::WordWrap(20, 15, 40, "You lose. Press R to play again.");
+		Console::ResetColor();
+	}
 
 	Console::Lock(false);
 }
 
 void Game::CheckCollision()
 {
-	// TODO #4 - Update collision to check all bricks
-	if (brick.Contains(ball.x_position + ball.x_velocity, ball.y_position + ball.y_velocity))
+	int removeindex = -1; //added these two to keep track of the boxes to delete later
+	int index = 0;
+	for (Box& brick : Game::brick) // simply implemented the colitoon back to the code as the first todo was stated :D (its still too easy *super sus eyes)
 	{
-		brick.color = ConsoleColor(brick.color - 1);
-		ball.y_velocity *= -1;
+		// TODO #4 - Update collision to check all bricks
+		if (brick.Contains(ball.x_position + ball.x_velocity, ball.y_position + ball.y_velocity))
+		{
+			brick.color = ConsoleColor(brick.color - 1);
+			ball.y_velocity *= -1;
 
-		// TODO #5 - If the ball hits the same brick 3 times (color == black), remove it from the vector
-
+			// TODO #5 - If the ball hits the same brick 3 times (color == black), remove it from the vector
+			if (brick.color == ConsoleColor::Black)
+			{
+				removeindex = index; // simple storage to track which block will turn black! :D
+			}
+			break;
+		}
+		++index;
 	}
-
+	if (removeindex != -1)
+	{
+		Game::brick.erase(Game::brick.begin() + removeindex); //bye bye brick! just deletes the brick that turns black without moving the others visually! :D
+	}
 	// TODO #6 - If no bricks remain, pause ball and display (render) victory text with R to reset
-
+	if (Game::brick.empty())
+	{
+		ball.moving = false; //tested and it works well now gotta make the message
+	}
 
 	if (paddle.Contains(ball.x_position + ball.x_velocity, ball.y_velocity + ball.y_position))
 	{
@@ -95,4 +146,8 @@ void Game::CheckCollision()
 	}
 
 	// TODO #7 - If ball touches bottom of window, pause ball and display (render) defeat text with R to reset
+	if (ball.y_position >= WINDOW_HEIGHT - 1)
+	{
+		ball.moving = false; //this is the fail condion to make it stop, but if its forced (pressing v) while its moving upwards, it keeps going
+	}
 }
