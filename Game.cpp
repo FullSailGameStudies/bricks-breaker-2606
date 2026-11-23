@@ -8,6 +8,7 @@ Game::Game()
 
 void Game::Reset()
 {
+	gameOver = false;
 	Console::SetWindowSize(WINDOW_WIDTH, WINDOW_HEIGHT);
 	Console::CursorVisible(false);
 	paddle.width = 12;
@@ -66,6 +67,8 @@ bool Game::Update()
 //  All rendering, including text, should occur in the Render function
 void Game::Render() const
 {
+	if (gameOver)
+		return;
 	Console::Lock(true);
 	Console::Clear();
 	
@@ -93,11 +96,15 @@ void Game::CheckCollision()
 			// TODO #5 - If the ball hits the same brick 3 times (color == black), remove it from the vector
 			if (brick.color == Black)
 				bricks.erase(bricks.begin() + i);
+			
 		}
 
 		// TODO #6 - If no bricks remain, pause ball and display (render) victory text with R to reset
 		if (bricks.empty())
+		{
 			ball.moving = false;
+			Console::WordWrap(WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2, 5, "Test");
+		}
 	}
 	
 
@@ -107,6 +114,12 @@ void Game::CheckCollision()
 	}
 
 	// TODO #7 - If ball touches bottom of window, pause ball and display (render) defeat text with R to reset
-	if (ball.y_position == WINDOW_HEIGHT-1)
+	if (ball.y_position == WINDOW_HEIGHT - 1)
+	{
+		gameOver = true;
 		ball.moving = false;
+		Console::Lock(true);
+		Console::WordWrap(WINDOW_WIDTH/2-15, WINDOW_HEIGHT/2, 50, "GAME OVER. PRESS [R] TO RESTART.");
+		Console::Lock(false);
+	}
 }
