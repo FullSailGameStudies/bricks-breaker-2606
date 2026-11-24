@@ -9,6 +9,7 @@ Game::Game()
 void Game::Reset()
 {
 	gameOver = false;
+	won = false;
 	Console::SetWindowSize(WINDOW_WIDTH, WINDOW_HEIGHT);
 	Console::CursorVisible(false);
 	paddle.width = 12;
@@ -21,15 +22,18 @@ void Game::Reset()
 	ResetBall();
 
 	// TODO #2 - Add this brick and 4 more bricks to the vector
-	for (int i = 0; i < bricks.size(); i++)
+	bricks.clear();
+	int numBricks = 5;
+	for (int i = 0; i < numBricks; i++)
 	{
-		Box& brick = bricks[i];
+		Box brick;
 		brick.width = 10;
 		brick.height = 2;
 		brick.x_position = i * 10;
 		brick.y_position = 5;
 		brick.doubleThick = true;
 		brick.color = ConsoleColor::DarkGreen;
+		bricks.push_back(brick);
 	}
 }
 
@@ -67,11 +71,16 @@ bool Game::Update()
 //  All rendering, including text, should occur in the Render function
 void Game::Render() const
 {
-	if (gameOver)
-		return;
 	Console::Lock(true);
 	Console::Clear();
 	
+	if (gameOver)
+	{
+		if (won)
+			Console::WordWrap(WINDOW_WIDTH / 2 - 15, WINDOW_HEIGHT / 2, 50, "YOU WIN. PRESS [R] TO RESTART.");
+		else
+			Console::WordWrap(WINDOW_WIDTH / 2 - 15, WINDOW_HEIGHT / 2, 50, "GAME OVER. PRESS [R] TO RESTART.");
+	}
 	paddle.Draw();
 	ball.Draw();
 
@@ -80,6 +89,8 @@ void Game::Render() const
 		brick.Draw();
 
 	Console::Lock(false);
+
+	
 }
 
 void Game::CheckCollision()
@@ -95,18 +106,21 @@ void Game::CheckCollision()
 
 			// TODO #5 - If the ball hits the same brick 3 times (color == black), remove it from the vector
 			if (brick.color == Black)
+			{
+				//brick.Draw();
 				bricks.erase(bricks.begin() + i);
-			
-		}
-
-		// TODO #6 - If no bricks remain, pause ball and display (render) victory text with R to reset
-		if (bricks.empty())
-		{
-			ball.moving = false;
-			Console::WordWrap(WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2, 5, "Test");
+			}
 		}
 	}
-	
+
+	// TODO #6 - If no bricks remain, pause ball and display (render) victory text with R to reset
+	if (bricks.empty())
+	{
+		gameOver = true;
+		won = true;
+		ball.moving = false;
+		
+	}
 
 	if (paddle.Contains(ball.x_position + ball.x_velocity, ball.y_velocity + ball.y_position))
 	{
@@ -117,9 +131,7 @@ void Game::CheckCollision()
 	if (ball.y_position == WINDOW_HEIGHT - 1)
 	{
 		gameOver = true;
+		won = false;
 		ball.moving = false;
-		Console::Lock(true);
-		Console::WordWrap(WINDOW_WIDTH/2-15, WINDOW_HEIGHT/2, 50, "GAME OVER. PRESS [R] TO RESTART.");
-		Console::Lock(false);
 	}
 }
